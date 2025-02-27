@@ -1,0 +1,184 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Formatter</title>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;            
+            padding: 0; margin: 0;
+            background-color: #246EB9;			
+            color: white;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            margin-bottom: 20px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #dedede;
+            border-radius: 12px;
+            outline: none;
+        }
+		
+		.form-group {
+			display: flex; flex-direction: column; gap: 10px;
+		}
+		
+		input {
+			padding: 5px;
+			border: 1px solid #dedede;
+			border-radius: 6px;
+			outline: none;
+			font-size: 1.2rem;
+		}
+        button {
+            padding: 10px 15px;
+			border-radius: 4px;
+			border: none;
+			font-weight: bold;
+            font-size: 16px;
+            margin-right: 10px;
+			background-color: #FFC857;
+			height: fit-content;
+        }
+		button:hover {
+			cursor: pointer;
+		}
+		
+		.editor {
+			max-width: 80%;			
+		}
+		
+		.app {
+			padding: 15px 20px;
+		}
+		
+		.btn-copy {
+			padding: 3px 7px;
+			background-color: #DDFFF7;
+		}
+		
+		.panel-h {
+			padding: 10px;
+			max-width: 80%;
+			display: flex; align-items: center; gap: 10px;			
+		}
+		
+		.form-params-panel {
+			display: flex; align-items: center; gap: 25px; flex-wrap: wrap;			
+		}
+		
+		.pb-2 { padding-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<section class="app" x-data="textFormatter()">
+    <h1>Text Formatter</h1>
+	
+    <article class="editor">
+        <div class="form-params-panel pb-2">
+            <div class="form-group">
+                <label for="charLimit">Character Limit:</label>
+                <input type="number" x-model.number="charLimit" min="1" style="width: 60px;" />
+            </div>
+            <div class="form-group">
+                <label for="separator">Separator:</label>
+                <input type="text" x-model="separator" style="width: 36px;" />
+            </div>
+        </div>
+
+        <textarea x-model="userInput" placeholder="Enter your text here..."></textarea>
+        <button @click="formatText()">Format Text</button>		
+        <button @click="toggleFormat()">Toggle Format</button>
+        <button @click="slugifyText()">Slugify Text</button>		
+
+        <div class="panel-h">
+            <h2>Formatted Text:</h2>
+            <button class="btn-copy" @click="copyToClipboard()">Copy</button>
+        </div>
+        <textarea x-ref="resultRef" x-model="formattedOutput" readonly></textarea>
+    </article>
+</section>
+
+<script>
+    function textFormatter() {
+        return {
+            charLimit: 80,
+            separator: '-',
+            userInput: '',
+            formattedOutput: '',
+
+            formatText() {
+                const maxLineLength = this.charLimit || 80; 
+                this.formattedOutput = this.breakTextIntoLines(this.userInput, maxLineLength);
+            },
+
+            breakTextIntoLines(text, maxLineLength) {
+                const words = text.split(' ');
+                let formattedText = '';
+                let currentLine = '';
+
+                words.forEach(word => {
+                    if (currentLine.length + word.length + (currentLine.length > 0 ? 1 : 0) <= maxLineLength) {
+                        currentLine += (currentLine.length > 0 ? ' ' : '') + word;
+                    } else {
+                        if (currentLine.length > 0) {
+                            formattedText += currentLine + '\n';
+                        }
+                        currentLine = word; 
+                    }
+                });
+
+                if (currentLine.length > 0) {
+                    formattedText += currentLine;
+                }
+
+                return formattedText;
+            },
+
+            copyToClipboard() {                			
+				console.log('=====', this.$refs.resultRef);
+                this.$refs.resultRef.select();
+                document.execCommand('copy');                
+            },
+
+            toggleFormat() {
+                if (this.userInput.includes(',')) {
+                    const hashtags = this.userInput.split(',').map(item => `#${item.trim()}`).join(' ');
+                    this.formattedOutput = hashtags;
+                } else if (this.userInput.startsWith('#')) {
+                    const items = this.userInput.split(' ').map(item => item.replace('#', '').trim()).join(',');
+                    this.formattedOutput = items;
+                } else {
+                    alert("The input format is not recognized. Please enter text in either:\n- Format 1: ExpressionsFrançaises,ÊtreCommeLesDoigtsDeLaMain\n- Format 2: #EnglishIdioms #LearnEnglish");
+                }
+            },
+
+            slugifyText() {
+                if (this.userInput.trim() === '') {
+                    alert("Please enter text to slugify. The input field cannot be empty.");
+                    return;
+                }
+
+                const slugifiedText = this.userInput
+                    .toLowerCase()
+                    .replace(/['"]/g, this.separator)
+                    .normalize('NFKD')
+                    .replace(/[\u0300-\u036f]/g, '')
+                    .replace(/[^a-z0-9\s-]/g, '')
+                    .trim()
+                    .replace(/\s+/g, this.separator)
+                    .replace(new RegExp(`${this.separator}+`, 'g'), this.separator);
+
+                this.formattedOutput = slugifiedText;
+            },
+        };
+    }
+</script>
+
+</body>
+</html>
