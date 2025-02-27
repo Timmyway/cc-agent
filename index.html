@@ -10,7 +10,7 @@
 <body>
 
 <section class="app" x-data="textFormatter()">
-    <h1>Text Formatter</h1>
+    <h1>CC Agent<span class="text-base" x-text="` (${userInput?.length})`"></span></h1>
 	
     <article class="editor">
         <div class="form-params-panel pb-2">
@@ -24,10 +24,11 @@
             </div>
         </div>
 
+        
         <textarea class="textarea-in" x-model="userInput" placeholder="Enter your text here..."></textarea>
         <div class="panel-actions">
-            <button @click="formatText()">Format</button>		
-            <button @click="toggleFormat()">Toggle Format</button>
+            <button @click="applyLineBreaks()">Wrap Text</button>		
+            <button @click="toggleFormat()">Toggle Hashtags/List</button>
             <div class="btn-group">
                 <button @click="slugifyText()">Slugify</button>
                 <button class="btn-danger text-white" @click="unslugifyText()">UnSlugify</button>
@@ -50,7 +51,7 @@
             userInput: '',
             formattedOutput: '',
 
-            formatText() {
+            applyLineBreaks() {
                 const maxLineLength = this.charLimit || 80; 
                 this.formattedOutput = this.breakTextIntoLines(this.userInput, maxLineLength);
             },
