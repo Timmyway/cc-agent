@@ -92,9 +92,10 @@
         </div>
 
         <textarea x-model="userInput" placeholder="Enter your text here..."></textarea>
-        <button @click="formatText()">Format Text</button>		
+        <button @click="formatText()">Format</button>		
         <button @click="toggleFormat()">Toggle Format</button>
-        <button @click="slugifyText()">Slugify Text</button>		
+        <button @click="slugifyText()">Slugify</button>
+        <button @click="unslugifyText()">UnSlugify</button>
 
         <div class="panel-h">
             <h2>Formatted Text:</h2>
@@ -159,23 +160,41 @@
             },
 
             slugifyText() {
+                // Check if the input is empty and alert the user if true
                 if (this.userInput.trim() === '') {
                     alert("Please enter text to slugify. The input field cannot be empty.");
                     return;
                 }
-
+            
                 const slugifiedText = this.userInput
-                    .toLowerCase()
-                    .replace(/['"]/g, this.separator)
-                    .normalize('NFKD')
-                    .replace(/[\u0300-\u036f]/g, '')
-                    .replace(/[^a-z0-9\s-]/g, '')
-                    .trim()
-                    .replace(/\s+/g, this.separator)
-                    .replace(new RegExp(`${this.separator}+`, 'g'), this.separator);
-
+                    .toLowerCase() // Convert the text to lowercase for uniformity
+                    .replace(/['"]/g, this.separator) // Replace single and double quotes with the defined separator
+                    .normalize('NFKD') // Normalize to decompose accented characters into base character + diacritic
+                    .replace(/[\u0300-\u036f]/g, '') // Remove diacritic marks (accents, tildes, etc.)
+                    .replace(/[^a-z0-9\s-]/g, '') // Remove all characters except letters, numbers, spaces, and hyphens
+                    .trim() // Remove leading and trailing spaces
+                    .replace(/\s+/g, this.separator) // Replace spaces with the defined separator
+                    .replace(new RegExp(`${this.separator}+`, 'g'), this.separator); // Ensure no consecutive separators
+            
+                // Store the slugified text in the output variable
                 this.formattedOutput = slugifiedText;
-            },
+            },  
+            unslugifyText() {
+                if (this.userInput.trim() === '') {
+                    alert("Please enter a slug to unslugify. The input field cannot be empty.");
+                    return;
+                }
+            
+                const unslugifiedText = this.userInput
+                    .replace(/([a-z])([A-Z])/g, '$1 $2') // Add space between a lowercase letter followed by an uppercase letter (camelCase)
+                    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2') // Handle cases like 'ABlue' -> 'A Blue'
+                    .replace(new RegExp(this.separator, 'g'), ' ') // Replace separators (e.g., dashes, underscores) with spaces
+                    .trim() // Remove leading and trailing spaces
+                    .replace(/\s+/g, ' ') // Ensure only single spaces between words
+                    .replace(/\b\w/g, char => char.toUpperCase()); // Capitalize first letter of each word
+            
+                this.formattedOutput = unslugifiedText;
+            },         
         };
     }
 </script>
