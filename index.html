@@ -5,74 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Text Formatter</title>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;            
-            padding: 0; margin: 0;
-            background-color: #246EB9;			
-            color: white;
-        }
-        textarea {
-            width: 100%;
-            height: 150px;
-            margin-bottom: 20px;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #dedede;
-            border-radius: 12px;
-            outline: none;
-        }
-		
-		.form-group {
-			display: flex; flex-direction: column; gap: 10px;
-		}
-		
-		input {
-			padding: 5px;
-			border: 1px solid #dedede;
-			border-radius: 6px;
-			outline: none;
-			font-size: 1.2rem;
-		}
-        button {
-            padding: 10px 15px;
-			border-radius: 4px;
-			border: none;
-			font-weight: bold;
-            font-size: 16px;
-            margin-right: 10px;
-			background-color: #FFC857;
-			height: fit-content;
-        }
-		button:hover {
-			cursor: pointer;
-		}
-		
-		.editor {
-			max-width: 80%;			
-		}
-		
-		.app {
-			padding: 15px 20px;
-		}
-		
-		.btn-copy {
-			padding: 3px 7px;
-			background-color: #DDFFF7;
-		}
-		
-		.panel-h {
-			padding: 10px;
-			max-width: 80%;
-			display: flex; align-items: center; gap: 10px;			
-		}
-		
-		.form-params-panel {
-			display: flex; align-items: center; gap: 25px; flex-wrap: wrap;			
-		}
-		
-		.pb-2 { padding-bottom: 10px; }
-    </style>
+    <link rel="stylesheet" href="assets/css/app.css">
 </head>
 <body>
 
@@ -87,21 +20,25 @@
             </div>
             <div class="form-group">
                 <label for="separator">Separator:</label>
-                <input type="text" x-model="separator" style="width: 36px;" />
+                <input type="text" x-model="separator" style="width: 36px;" maxlength="1" />
             </div>
         </div>
 
-        <textarea x-model="userInput" placeholder="Enter your text here..."></textarea>
-        <button @click="formatText()">Format</button>		
-        <button @click="toggleFormat()">Toggle Format</button>
-        <button @click="slugifyText()">Slugify</button>
-        <button @click="unslugifyText()">UnSlugify</button>
+        <textarea class="textarea-in" x-model="userInput" placeholder="Enter your text here..."></textarea>
+        <div class="panel-actions">
+            <button @click="formatText()">Format</button>		
+            <button @click="toggleFormat()">Toggle Format</button>
+            <div class="btn-group">
+                <button @click="slugifyText()">Slugify</button>
+                <button class="btn-danger text-white" @click="unslugifyText()">UnSlugify</button>
+            </div>
+        </div>        
 
         <div class="panel-h">
             <h2>Formatted Text:</h2>
             <button class="btn-copy" @click="copyToClipboard()">Copy</button>
         </div>
-        <textarea x-ref="resultRef" x-model="formattedOutput" readonly></textarea>
+        <textarea class="textarea-out" x-ref="resultRef" x-model="formattedOutput" readonly></textarea>
     </article>
 </section>
 
